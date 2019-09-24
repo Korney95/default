@@ -9,11 +9,15 @@ dir=/root/default
 pass=$(pwgen -s -1 14)
 
 
-#mkdir /var/www/$sitename &&
+apt update && apt upgarde &&
 
-apt install -y dh-php php php-common php-gd php-gettext php-mcrypt php-pear php-phpseclib php-tcpdf php-xml php7.0 php7.0-cli php7.0-common php7.0-curl php7.0-dev php7.0-fpm php7.0-gd php7.0-json php7.0-mbstring php7.0-mcrypt php7.0-mysql php7.0-opcache php7.0-readline php7.0-xml &&
+apt install -y dh-php php php-common php-gd php-gettext php-mcrypt php-pear php-phpseclib php-tcpdf php-xml php7.0 php7.0-cli php7.0-common php7.0-curl php7.0-dev php7.0-fpm php7.0-gd php7.0-json php7.0-mbstring php7.0-mcrypt php7.0-mysql php7.0-opcache php7.0-readline php7.0-xml pwgen &&
 
 apt install -y nginx &&
+
+mkdir /var/www/$sitename &&
+
+mkdir /var/log/nginx/$sitename &&
 
 apt install -y mysql-server &&
 
@@ -57,6 +61,22 @@ sed -i  -e "s/pochtatech.sk.ru/$sitename/g" /etc/php/7.0/fpm/pool.d/$sitename.co
 
 service php7.0-fpm restart &&
 
-#ln -s /usr/share/phpmyadmin/ /var/www/html/phpmyadmin &&
+####### ADD CONFIG FOR WEBSITE ####################
+
+touch /etc/nginx/sites-available/$sitename.vhost &&
+
+cat $dir/nginx.vhost > /etc/nginx/sites-available/$sitename.vhost &&
+
+        sed -i  -e "s/patentspower.sk.ru/$sitename/g" /etc/nginx/sites-available/$sitename.vhost &&
+
+ln -s /etc/nginx/sites-available/$sitename.vhost /etc/nginx/sites-enabled/$sitename.vhost &&
+
+
+nginx -t
+
+###################################################
+
+
+ln -s /usr/share/phpmyadmin/ /var/www/html/phpmyadmin &&
 
 nginx -t && nginx -s reload 
