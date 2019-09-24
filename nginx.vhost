@@ -1,0 +1,64 @@
+server {
+        listen *:80;
+        rewrite ^/skewer_build/(.+)$ /skewer/build/$1 break;
+
+        server_name  patentspower.sk.ru www.patentspower.sk.ru; 
+
+        root   /var/www/patentspower.sk.ru/web/;
+
+
+
+
+        error_log /var/log/nginx/patentspower.sk.ru/error.log;
+        access_log /var/log/nginx/patentspower.sk.ru/access.log combined;
+
+        location ~ /\. {
+                        deny all;
+        }
+location = /favicon.ico {
+            log_not_found off;
+            access_log off;
+            expires max;
+            add_header Cache-Control "public, must-revalidate, proxy-revalidate";
+        }
+
+
+
+        location ~ \.php$ {
+            try_files /a6d0a865047264f54e2ea2004678290c.htm @php;
+        }
+
+        location @php {
+        try_files $uri $uri/ /index.php?$args;
+            include /etc/nginx/fastcgi_params;
+            fastcgi_pass unix:/var/run/patentspower.sk.ru.sock;
+            fastcgi_index index.php;
+            fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+            fastcgi_intercept_errors on;
+                fastcgi_read_timeout 300;
+        }
+location / {
+        index index.php index.html index.htm;
+        try_files $uri $uri/ /index.php?$args;
+        }
+
+        location ~* ^.+\.(jpg|jpeg|gif|png|svg|js|css|mp3|ogg|mpe?g|avi|zip|gz|bz2?|rar|swf|woff)$ {
+
+                                         access_log off;
+                                        expires 7d;
+                                        add_header Cache-Control "public";
+}
+#GZIP
+ gzip on;
+ gzip_min_length 1000;
+ gzip_proxied expired no-cache no-store private auth;
+ gzip_types text/plain application/xml;
+ gzip_buffers 32 4k;
+ gzip_comp_level 9;
+ gzip_disable "msie6";
+ gzip_http_version 1.1;
+ gzip_static on;
+ gzip_vary on;
+ gzip_types text/css text/javascript text/xml text/plain text/x-component application/javascript application/x-javascript application/json application/xml application/rss+xml font/truetype application/x-font-ttf font/opentype application/vnd.ms-fontobject image/svg+xml;
+}
+

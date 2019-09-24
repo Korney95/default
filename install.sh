@@ -1,7 +1,13 @@
 #!/bin/bash
 
-sitename=huawei.sk.ru
+echo "Введите доменное имя сайта !"
+
+read sitename
+
 dir=/root/default
+
+pass=$(pwgen -s -1 14)
+
 
 #mkdir /var/www/$sitename &&
 
@@ -14,6 +20,26 @@ apt install -y mysql-server &&
 apt install -y phpmyadmin &&
 
 apt install -y exim4 &&
+#################### STRICT MODE #################################
+mysql -u root -p "" -e "select @@GLOBAL.sql_mode;"
+
+touch /etc/mysql/conf.d/disable_strict_mode.cnf &&
+
+echo "[mysqld]" > /etc/mysql/conf.d/disable_strict_mode.cnf &&
+
+echo "sql_mode=''" >> /etc/mysql/conf.d/disable_strict_mode.cnf &&
+
+service mysql restart &&
+
+mysql -u root -p "" -e "select @@GLOBAL.sql_mode;" &&
+
+echo "strict mode DISABLE" &&
+################ STRICT MODE ####################################
+mysql -u root -p "" -e  "create database $sitename;" &&
+
+mysql -u root -p "" -e "CREATE USER '$sitename'@'localhost' IDENTIFIED BY '$pass';" && 
+
+mysql -u root -p "" -e "GRANT ALL PRIVILEGES ON $sitename.* TO '$sitename'@'localhost';" && 
 
 #dpkg-reconfigure exim4-config &&
 
